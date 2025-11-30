@@ -1,3 +1,7 @@
+// Constants for validation
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^[\d\s\-\+\(\)]+$/;
+
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', function() {
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');
@@ -43,22 +47,20 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Email validation
             const email = document.getElementById('email').value.trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (email === '') {
                 showError('emailError', 'Please enter your email address');
                 isValid = false;
-            } else if (!emailRegex.test(email)) {
+            } else if (!EMAIL_REGEX.test(email)) {
                 showError('emailError', 'Please enter a valid email address');
                 isValid = false;
             }
             
             // Phone validation
             const phone = document.getElementById('phone').value.trim();
-            const phoneRegex = /^[\d\s\-\+\(\)]+$/;
             if (phone === '') {
                 showError('phoneError', 'Please enter your phone number');
                 isValid = false;
-            } else if (!phoneRegex.test(phone) || phone.length < 10) {
+            } else if (!PHONE_REGEX.test(phone) || phone.length < 10) {
                 showError('phoneError', 'Please enter a valid phone number');
                 isValid = false;
             }
@@ -190,19 +192,17 @@ function validateField(field) {
             break;
             
         case 'email':
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (value === '') {
                 showError(errorId, 'Please enter your email address');
-            } else if (!emailRegex.test(value)) {
+            } else if (!EMAIL_REGEX.test(value)) {
                 showError(errorId, 'Please enter a valid email address');
             }
             break;
             
         case 'phone':
-            const phoneRegex = /^[\d\s\-\+\(\)]+$/;
             if (value === '') {
                 showError(errorId, 'Please enter your phone number');
-            } else if (!phoneRegex.test(value) || value.length < 10) {
+            } else if (!PHONE_REGEX.test(value) || value.length < 10) {
                 showError(errorId, 'Please enter a valid phone number');
             }
             break;
@@ -254,8 +254,21 @@ function isElementInViewport(el) {
     );
 }
 
-// Animate elements on scroll
-window.addEventListener('scroll', function() {
+// Throttle function to limit scroll event frequency
+function throttle(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        if (!timeout) {
+            timeout = setTimeout(() => {
+                func(...args);
+                timeout = null;
+            }, wait);
+        }
+    };
+}
+
+// Animate elements on scroll (throttled for performance)
+const handleScroll = throttle(function() {
     const animatedElements = document.querySelectorAll('.feature-card, .video-item, .gallery-item');
     animatedElements.forEach(el => {
         if (isElementInViewport(el)) {
@@ -263,4 +276,6 @@ window.addEventListener('scroll', function() {
             el.style.transform = 'translateY(0)';
         }
     });
-});
+}, 100);
+
+window.addEventListener('scroll', handleScroll);
